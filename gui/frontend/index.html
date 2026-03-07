@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FolderDiff</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ── 네비게이션 바 ──────────────────────────────────────────────────── -->
+  <nav id="navbar">
+    <div class="navbar-logo">📂 <span>Folder</span>Diff</div>
+    <div class="navbar-spacer"></div>
+    <div class="navbar-hint">n/p: diff 이동 · →/←: 채택 · Ctrl+S: 저장 · Esc: 뒤로</div>
+  </nav>
+
+  <!-- ── 경로 바 ────────────────────────────────────────────────────────── -->
+  <div id="pathbar">
+    <div class="path-slot">
+      <label>왼쪽</label>
+      <div class="path-input-wrap">
+        <input type="text" id="input-left" placeholder="/path/to/left" spellcheck="false">
+        <button class="btn-browse" id="btn-browse-left" title="폴더 선택">📁</button>
+      </div>
+    </div>
+
+    <div class="path-arrow">⇄</div>
+
+    <div class="path-slot">
+      <label>오른쪽</label>
+      <div class="path-input-wrap">
+        <input type="text" id="input-right" placeholder="/path/to/right" spellcheck="false">
+        <button class="btn-browse" id="btn-browse-right" title="폴더 선택">📁</button>
+      </div>
+    </div>
+
+    <button class="btn-compare" id="btn-compare">비교</button>
+  </div>
+
+  <!-- ── 통계 바 ────────────────────────────────────────────────────────── -->
+  <div id="statsbar"></div>
+
+  <!-- ── 메인 콘텐츠 ────────────────────────────────────────────────────── -->
+  <main id="main">
+    <!-- 폴더 비교 뷰 -->
+    <div id="folder-diff-view"></div>
+    <!-- 파일 diff/머지 뷰 -->
+    <div id="file-diff-view" class="hidden"></div>
+  </main>
+
+</div>
+
+<!-- ── 폴더 브라우저 모달 ───────────────────────────────────────────────── -->
+<div id="modal-overlay" tabindex="-1">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">📁 폴더 선택</span>
+      <span class="modal-crumb" id="modal-crumb"></span>
+    </div>
+    <div class="modal-quick">
+      <button class="btn-quick" id="btn-modal-home">🏠 홈</button>
+      <button class="btn-quick" id="btn-modal-root">/ 루트</button>
+    </div>
+    <div class="modal-list" id="modal-list"></div>
+    <div class="modal-footer">
+      <input type="text" id="modal-path-input" placeholder="경로를 직접 입력하세요" spellcheck="false">
+      <button class="btn-cancel" id="btn-modal-cancel">취소</button>
+      <button class="btn-select" id="btn-modal-select">선택</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 알림 토스트 ────────────────────────────────────────────────────────── -->
+<div id="notifications"></div>
+
+<script type="module" src="/static/js/app.js"></script>
+</body>
+</html>

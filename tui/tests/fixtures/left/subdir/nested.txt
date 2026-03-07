@@ -1,0 +1,2 @@
+Nested file left content
+Extra line in left

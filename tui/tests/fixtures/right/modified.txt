@@ -1,0 +1,5 @@
+First line
+Second line (right version)
+Third line
+Fifth line
+Sixth line — right only
