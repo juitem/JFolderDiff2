@@ -1,0 +1,63 @@
+# .folderdiff.toml — FolderDiff 제외 설정 예시
+#
+# 이 파일을 .folderdiff.toml 로 복사하고 필요에 맞게 수정하세요.
+#
+# 탐색 순서 (앞에서 먼저 발견된 파일 하나만 적용):
+#   1. --config 로 명시한 경로  (TUI)
+#   2. 왼쪽 비교 폴더 내 .folderdiff.toml
+#   3. 오른쪽 비교 폴더 내 .folderdiff.toml
+#   4. 현재 작업 디렉터리 .folderdiff.toml
+#   5. 홈 디렉터리 ~/.folderdiff.toml
+
+[exclude]
+
+# ── 이름 정확 일치 (파일/폴더 모두) ─────────────────────────────────────────
+names = [
+    ".git",
+    ".svn",
+    ".hg",
+    "__pycache__",
+    "node_modules",
+    ".DS_Store",
+    "Thumbs.db",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".ruff_cache",
+]
+
+# ── 이름 glob 패턴 (파일/폴더 모두) ──────────────────────────────────────────
+# fnmatch 패턴 사용. 경로가 아닌 이름에만 적용됩니다.
+patterns = [
+    "*.pyc",
+    "*.pyo",
+    "*.pyd",
+    "*.log",
+    "*.tmp",
+    "*.swp",
+    "*.bak",
+    ".#*",       # Emacs 잠금 파일
+    "#*#",       # Emacs 자동 저장
+]
+
+# ── 폴더 이름 정확 일치 (폴더만) ─────────────────────────────────────────────
+dirs = [
+    "venv",
+    ".venv",
+    "env",
+    ".tox",
+    "build",
+    "dist",
+    ".eggs",
+    "*.egg-info",
+    ".idea",
+    ".vscode",
+    "__MACOSX",
+]
+
+# ── 상대 경로 glob 패턴 (비교 루트 기준) ─────────────────────────────────────
+# 루트로부터의 상대 경로 전체에 대해 fnmatch를 적용합니다.
+# 예: "docs/build/*" 는 docs/build/ 아래 모든 항목을 제외합니다.
+path_patterns = [
+    # "docs/build/*",
+    # "*.egg-info/*",
+]

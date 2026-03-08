@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List, Optional
 
+from ..config import ExcludeConfig, should_exclude
+
 
 @dataclass
 class FolderEntry:
@@ -21,13 +23,21 @@ class FolderEntry:
     depth: int = 0
 
 
-def compare_folders(left_root: Path, right_root: Path) -> List[FolderEntry]:
+def compare_folders(
+    left_root: Path,
+    right_root: Path,
+    exclude: Optional[ExcludeConfig] = None,
+) -> List[FolderEntry]:
     """두 폴더 트리를 재귀적으로 비교하여 항목 목록을 반환한다."""
-    return _compare_dir(left_root, right_root, "", 0)
+    return _compare_dir(left_root, right_root, "", 0, exclude or ExcludeConfig())
 
 
 def _compare_dir(
-    left_path: Path, right_path: Path, rel: str, depth: int
+    left_path: Path,
+    right_path: Path,
+    rel: str,
+    depth: int,
+    exclude: ExcludeConfig,
 ) -> List[FolderEntry]:
     """단일 디렉터리 레벨을 비교한다."""
     left_items: set[str] = set()
@@ -51,6 +61,13 @@ def _compare_dir(
         l_path = left_path / name
         r_path = right_path / name
         rel_path = f"{rel}/{name}".lstrip("/")
+
+        # 제외 설정 적용
+        is_dir_hint = (name in left_items and l_path.is_dir()) or (
+            name in right_items and r_path.is_dir()
+        )
+        if should_exclude(name, rel_path, is_dir_hint, exclude):
+            continue
 
         l_exists = name in left_items
         r_exists = name in right_items
@@ -81,7 +98,7 @@ def _compare_dir(
                 depth=depth,
             )
         elif is_dir:
-            children = _compare_dir(l_path, r_path, rel_path, depth + 1)
+            children = _compare_dir(l_path, r_path, rel_path, depth + 1, exclude)
             has_diff = any(e.status != "same" for e in flatten_entries(children))
             status = "different" if has_diff else "same"
             entry = FolderEntry(

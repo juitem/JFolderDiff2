@@ -7,6 +7,7 @@ from typing import Dict, List, Optional
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 
+from ..config import load_config
 from ..models.diff_engine import (
     AlignedLine,
     DiffChunk,
@@ -86,12 +87,24 @@ class DiffFileResponse(BaseModel):
 def compare_folder(
     left: str = Query(..., description="왼쪽 폴더 절대 경로"),
     right: str = Query(..., description="오른쪽 폴더 절대 경로"),
+    config: Optional[str] = Query(None, description="제외 설정 파일 절대 경로 (.folderdiff.toml)"),
 ) -> CompareFolderResponse:
     """두 폴더를 재귀적으로 비교한다."""
+    from pathlib import Path as _Path
     l_path = _resolve_dir(left, "left")
     r_path = _resolve_dir(right, "right")
 
-    entries = compare_folders(l_path, r_path)
+    try:
+        exclude = load_config(
+            explicit=_Path(config) if config else None,
+            left=l_path,
+            right=r_path,
+        )
+    except FileNotFoundError as e:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail=str(e))
+
+    entries = compare_folders(l_path, r_path, exclude)
     flat = flatten_entries(entries, expanded=None)
 
     same = sum(1 for e in flat if e.status == "same" and not e.is_dir)

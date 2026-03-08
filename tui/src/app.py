@@ -6,6 +6,7 @@ from pathlib import Path
 from textual.app import App, ComposeResult
 from textual.widgets import Label
 
+from .config import ExcludeConfig
 from .screens.folder_screen import FolderScreen
 
 
@@ -21,10 +22,18 @@ class FolderDiffApp(App):
     }
     """
 
-    def __init__(self, left_path: Path, right_path: Path) -> None:
+    def __init__(
+        self,
+        left_path: Path,
+        right_path: Path,
+        exclude_config: ExcludeConfig | None = None,
+    ) -> None:
         super().__init__()
         self.left_path = left_path
         self.right_path = right_path
+        self.exclude_config = exclude_config or ExcludeConfig()
 
     def on_mount(self) -> None:
-        self.push_screen(FolderScreen(self.left_path, self.right_path))
+        self.push_screen(
+            FolderScreen(self.left_path, self.right_path, self.exclude_config)
+        )

@@ -12,6 +12,7 @@ from textual.containers import Container
 from textual.screen import Screen
 from textual.widgets import DataTable, Footer, Header, Label, Static
 
+from ..config import ExcludeConfig
 from ..models.folder_diff import FolderEntry, compare_folders, flatten_entries
 
 # 상태별 아이콘과 색상
@@ -116,10 +117,16 @@ class FolderScreen(Screen):
     }
     """
 
-    def __init__(self, left_path: Path, right_path: Path) -> None:
+    def __init__(
+        self,
+        left_path: Path,
+        right_path: Path,
+        exclude_config: ExcludeConfig | None = None,
+    ) -> None:
         super().__init__()
         self.left_path = left_path
         self.right_path = right_path
+        self._exclude_config = exclude_config or ExcludeConfig()
         self._entries: List[FolderEntry] = []
         self._flat: List[FolderEntry] = []
         self._expanded: set[str] = set()
@@ -141,7 +148,7 @@ class FolderScreen(Screen):
     # ── 데이터 로드 ──────────────────────────────────────────────────────────
     @work(thread=True)
     def _load_entries(self) -> None:
-        entries = compare_folders(self.left_path, self.right_path)
+        entries = compare_folders(self.left_path, self.right_path, self._exclude_config)
         self.app.call_from_thread(self._populate, entries)
 
     def _populate(self, entries: List[FolderEntry]) -> None:

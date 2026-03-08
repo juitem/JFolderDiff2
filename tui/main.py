@@ -29,19 +29,31 @@
 """
 from __future__ import annotations
 
+import argparse
 import sys
 from pathlib import Path
 
 
 def main() -> None:
-    if len(sys.argv) != 3:
-        print(__doc__)
-        print(f"오류: 정확히 두 개의 경로가 필요합니다.")
-        print(f"사용법: python main.py <왼쪽_경로> <오른쪽_경로>")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(
+        description="FolderDiff — 폴더/파일 비교 및 머지 도구",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=__doc__,
+    )
+    parser.add_argument("left", help="왼쪽 폴더 경로")
+    parser.add_argument("right", help="오른쪽 폴더 경로")
+    parser.add_argument(
+        "--config", "-c",
+        metavar="경로",
+        help=(
+            "제외 설정 파일 경로 (.folderdiff.toml). "
+            "미지정 시 왼쪽 폴더 → 오른쪽 폴더 → 현재 디렉터리 → 홈 디렉터리 순으로 탐색."
+        ),
+    )
+    args = parser.parse_args()
 
-    left_path = Path(sys.argv[1]).expanduser().resolve()
-    right_path = Path(sys.argv[2]).expanduser().resolve()
+    left_path = Path(args.left).expanduser().resolve()
+    right_path = Path(args.right).expanduser().resolve()
 
     errors = []
     if not left_path.exists():
@@ -53,9 +65,21 @@ def main() -> None:
             print(f"오류: {e}")
         sys.exit(1)
 
+    from src.config import load_config
     from src.app import FolderDiffApp
 
-    app = FolderDiffApp(left_path, right_path)
+    try:
+        config_path = Path(args.config) if args.config else None
+        exclude_config = load_config(
+            explicit=config_path,
+            left=left_path,
+            right=right_path,
+        )
+    except FileNotFoundError as e:
+        print(f"오류: {e}")
+        sys.exit(1)
+
+    app = FolderDiffApp(left_path, right_path, exclude_config)
     app.run()
 
 
