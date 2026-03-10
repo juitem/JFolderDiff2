@@ -208,6 +208,10 @@ class FolderScreen(Screen):
         )
         self.query_one("#stats-bar", Label).update(stats)
 
+    # ── 이벤트 핸들러 ────────────────────────────────────────────────────────
+    def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
+        self.action_open_file()
+
     # ── 액션 ─────────────────────────────────────────────────────────────────
     def action_open_file(self) -> None:
         entry = self._current_entry()
